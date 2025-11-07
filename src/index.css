@@ -1,0 +1,8 @@
+html {
+  font-size: clamp(14px, 0.9vw + 8px, 18px);
+  font-family: "Comfortaa", sans-serif;
+}
+
+body {
+  background-color: #29a9ff;
+}

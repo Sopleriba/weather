@@ -1,0 +1,40 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  max-width: 42rem;
+  margin: auto;
+  background-color: #fff;
+  padding: 1rem 2rem 2rem 2rem;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+}
+.headerOfCard {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px black solid;
+  height: 13%;
+}
+.infoOfCard {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.blockWeather {
+  display: flex;
+  flex-direction: column;
+
+  width: 22%;
+}
+.icon {
+  width: 100px;
+}
+.temp {
+  font-size: 5rem;
+  display: flex;
+}
+.detalesWeather {
+  font-size: 1.6rem;
+  padding-top: 0.5rem;
+}
+.morning {
+}
