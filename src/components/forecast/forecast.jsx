@@ -9,19 +9,23 @@ export default function Forecast({ forecastData, cityData }) {
     forecastData.list.slice(0, 8)
   );
 
+  useEffect(() => {
+    if (forecastData && forecastData.list) {
+      setInfoForCards(forecastData.list.slice(0, 8));
+    }
+  }, [forecastData]);
+
   function onSelectButton(days = 1) {
+    if (!forecastData || !forecastData.list) return;
     switch (days) {
       case 3:
-        // setHowManyCards(24);
         setInfoForCards(forecastData.list.slice(0, 24));
         break;
       case 5:
-        // setHowManyCards(40);
         setInfoForCards(forecastData.list.slice(0, 40));
 
         break;
       default:
-        // setHowManyCards(8);ф
         setInfoForCards(forecastData.list.slice(0, 8));
     }
   }
@@ -38,7 +42,7 @@ export default function Forecast({ forecastData, cityData }) {
       {infoForCards.map((forecast, index) => (
         <WeatherCard
           key={index}
-          time={forecast.dt_txt}
+          data={forecast.dt_txt}
           code={forecast.weather[0].icon}
           description={forecast.weather[0].description}
           city={cityData}

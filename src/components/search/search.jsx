@@ -15,6 +15,7 @@ export default function Search({ getForecast, getCity }) {
   const [hasError, setHasError] = useState(false);
   const [errorName, setErrorName] = useState("");
   const [isRsponsed, setIsRsponsed] = useState(false);
+  const [responseWeather, setResponseWeather] = useState([]);
 
   useEffect(() => {
     const clickEnter = (event) => {
@@ -95,46 +96,51 @@ export default function Search({ getForecast, getCity }) {
     setErrorName("");
     setHasError(false);
     setSuggestions([]);
-    // setSearchTriggered(true)
 
     console.log("check_input: ", check_input);
 
     if (check_input == 1 && coordinates.length == 2) {
       try {
         console.log("запрос погоды");
+        const response = await requestWeatherForCoord(coordinates);
+        const data = await response.json();
 
-        const response_weather = await requestWeatherForCoord(coordinates);
-
-        const data = await response_weather.json();
+        setResponseWeather(data);
         getForecast(data);
-        console.log("data: ", data);
+        getCity(city);
+        console.log("responseWeather: ", data);
       } catch (err) {
         console.error("ошибка запроса погоды: ", err);
         setHasError(true);
         setErrorName("Не удалось найти погоду в этом городе");
       }
     } else if (check_input == 0 || coordinates.length != 2) {
-      const response = await searchCoordinatesForCity(city);
-      const data = await response.json();
-      console.log("data: ", data);
+      try {
+        const response = await searchCoordinatesForCity(city);
+        const data = await response.json();
 
-      if (data.length > 0) {
-        const coord = [];
-        coord.push(data[0].lon);
-        coord.push(data[0].lat);
-        console.log("coord: ", coord);
-        const response_weather = await (
-          await requestWeatherForCoord(coord)
-        ).json();
-        console.log("response_weather: ", response_weather);
-        getForecast(response_weather);
-        getCity(query);
-        console.log(response_weather.list[0].weather[0].description);
-      } else {
-        console.log("координаты не найдены");
-        setErrorName("Город не найден");
+        if (data.length > 0) {
+          const coord = [data[0].lon, data[0].lat];
+
+          console.log("coord: ", coord);
+
+          const weatherResponse = await requestWeatherForCoord(coord);
+          const weatherData = await weatherResponse.json();
+
+          setResponseWeather(weatherData);
+          getForecast(weatherData);
+          getCity(city);
+          console.log("responseWeather: ", weatherData);
+        } else {
+          console.log("координаты не найдены");
+          setErrorName("Город не найден");
+          setHasError(true);
+          setSuggestions([]);
+        }
+      } catch (err) {
+        console.error("ошибка поиска города: ", err);
+        setErrorName("Ошибка при поиске города");
         setHasError(true);
-        setSuggestions([]);
       }
     }
   }
@@ -166,3 +172,4 @@ export default function Search({ getForecast, getCity }) {
     </div>
   );
 }
+1;
