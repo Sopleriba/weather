@@ -1,11 +1,16 @@
 import classes from "./suggestionsList.module.css";
+import { useState } from "react";
+import { useEffect } from "react";
 
 export default function SuggestionsList({
   suggestions,
   setQuery,
   setCoord,
   setSuggestions,
-  setCheck_input,
+  setActiveSuggestion,
+  ref,
+  activeLi,
+  onSelectSuggestion,
 }) {
   if (!suggestions || suggestions.length === 0) return null;
 
@@ -14,14 +19,17 @@ export default function SuggestionsList({
       className={`${classes.ulSearch} ${classes.suggestions} ${
         suggestions.length > 0 ? classes.visible : ""
       }`}
+      ref={ref}
     >
       {suggestions.map((city, index) => (
         <li
-          className={classes.search_li}
+          className={`${classes.search_li} ${
+            activeLi === index ? classes.active : ""
+          }`}
           key={index}
           onClick={() => {
-            setCheck_input(1);
-
+            setActiveSuggestion(null);
+            () => onSelectSuggestion(city);
             setQuery(city.properties.name);
             setSuggestions([]);
             setCoord(city.geometry.coordinates);

@@ -22,8 +22,11 @@
 .blockWeather {
   display: flex;
   flex-direction: column;
-
+  text-align: center;
+  align-items: center;
   width: 22%;
+  font-size: 1.4rem;
+  font-weight: 400;
 }
 .icon {
   width: 100px;
@@ -37,4 +40,7 @@
   padding-top: 0.5rem;
 }
 .morning {
+}
+.headerOfDay {
+  text-align: center;
 }

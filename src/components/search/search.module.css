@@ -20,7 +20,7 @@
   border-radius: 0.8rem;
   outline: none;
   transition: all 0.2s ease-in-out;
-  height: fit-content;
+  height: 2.8rem;
 }
 
 .input:focus {

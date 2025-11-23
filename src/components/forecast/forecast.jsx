@@ -38,9 +38,10 @@ export default function Forecast({ forecastData, cityData }) {
   // time, city, code, description
   return (
     <>
-      <TabsSection onSelectButton={onSelectButton} />;
+      <TabsSection onSelectButton={onSelectButton} />
       {infoForCards.map((forecast, index) => (
         <WeatherCard
+          index={index}
           key={index}
           data={forecast.dt_txt}
           code={forecast.weather[0].icon}

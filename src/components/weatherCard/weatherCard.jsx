@@ -4,6 +4,7 @@ import { useState } from "react";
 
 export default function WeatherCard({
   data,
+  index,
   city,
   code,
   description,
@@ -41,12 +42,27 @@ export default function WeatherCard({
         return "day";
     }
   }
-  function whichDayOfWeek(data) {}
+  function whichDayOfWeek(day) {
+    const date = new Date(day); // формат: "2025-11-19"
+    const weekdays = [
+      "Воскресенье",
+      "Понедельник",
+      "Вторник",
+      "Среда",
+      "Четверг",
+      "Пятница",
+      "Суббота",
+    ];
+    return weekdays[date.getDay()];
+  }
 
   return (
     <>
-      {timeOfDay == "morning" ? <h2>{headerOfDay}</h2> : null}
-
+      {dataTime.slice(-5, -3) == "00" || index === 0 ? (
+        <h2 className={classes.headerOfDay}>
+          {whichDayOfWeek(data.slice(0, 10))}
+        </h2>
+      ) : null}
       <section className={`${classes.card} ${classes[timeOfDay]}`}>
         <div className={classes.headerOfCard}>
           <h3>{dataTimeFormatted}</h3>{" "}

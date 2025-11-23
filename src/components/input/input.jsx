@@ -1,6 +1,6 @@
 import classes from "../search/search.module.css";
 
-export default function Input({ query, onChange, hasError }) {
+export default function Input({ query, onChange, hasError, ref }) {
   return (
     <input
       className={`${classes.input} ${hasError ? classes.inputError : ""}`}
@@ -8,6 +8,8 @@ export default function Input({ query, onChange, hasError }) {
       value={query}
       placeholder="Введи город"
       onChange={onChange}
+      onClick={onChange}
+      ref={ref}
     />
   );
 }

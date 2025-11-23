@@ -12,7 +12,7 @@ function App() {
   function getForecast(data) {
     setForecastData(data);
   }
-  function getCity(city) {
+  function getCity1(city) {
     const City = city.charAt(0).toUpperCase() + city.slice(1);
     setCity(City);
   }
@@ -21,15 +21,12 @@ function App() {
     <>
       <div id="main_block">
         <h1 id="main_inscription">Weather</h1>
-        <Search getForecast={getForecast} getCity={getCity} />
+        <Search getForecast={getForecast} getCity={getCity1} />
         {forecastData ? (
           <Forecast forecastData={forecastData} cityData={city} />
         ) : null}
       </div>
-      <style>
-        @import
-        url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
-      </style>
+
     </>
   );
 }
