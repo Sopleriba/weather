@@ -43,7 +43,7 @@ export default function WeatherCard({
     }
   }
   function whichDayOfWeek(day) {
-    const date = new Date(day); // формат: "2025-11-19"
+    const date = new Date(day); // формат 2025-11-19
     const weekdays = [
       "Воскресенье",
       "Понедельник",

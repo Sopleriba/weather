@@ -4,16 +4,20 @@ import classes from "./search.module.css";
 import { useEffect } from "react";
 import SuggestionsList from "../suggestions/suggestionsList.jsx";
 import Input from "../input/input.jsx";
+import requestWeatherForCoord from "../../api/requestWeatherForCoord.jsx";
+import searchCoordinatesForCity from "../../api/searchCoordinatesForCity.jsx";
+import cityOfRequest from "../../api/cityOfRequest.jsx";
 
 export default function Search({ getForecast, getCity }) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [coord, setCoord] = useState([]);
-  const [check_input, setCheck_input] = useState(0); //проверка, воспользовался ли ползователь подсказкой (1) или ввел запрос вручную (0)
+  // const [check_input, setCheck_input] = useState(0); //проверка, воспользовался ли ползователь подсказкой (1) или ввел запрос вручную (0)
   const [hasError, setHasError] = useState(false);
   const [errorName, setErrorName] = useState("");
   const [responseWeather, setResponseWeather] = useState([]);
   const [activeSuggestion, setActiveSuggestion] = useState(null);
+  const [firstSugg, setFirstSugg] = useState(null);
 
   const refSearch = useRef(null);
   const refSuggList = useRef(null);
@@ -22,22 +26,28 @@ export default function Search({ getForecast, getCity }) {
   //проблема 1: нужно отменять первый запрос если уже начал выполнятся второй, либо поменять как-то апи, тк долгие запросы
   //проблема 2: че-то странное происходит если по разному делать запрос, типо через энтер, мышкой, таб и тд
   //дописать погоду в карточках
-  //вывод начала нового дня не работает
   //сделать красивее подсказки
-
+  //продолжить строка 209. доделать отправку города и во втором случае. проверить работу
   //навигация по подсказкам, и выполнение поиска при нажатии enter
   useEffect(() => {
     function suggNavigation(event) {
-      if (suggestions.length === 0) return;
       switch (event.key) {
         case "Enter":
           event.preventDefault();
           if (activeSuggestion === null && query.length >= 2) {
+            console.log("вызов функции onClickSearchButt", coord, query);
+
             onClickSearchButt(coord, query);
           } else if (activeSuggestion !== null && suggestions.length > 0) {
             const selected = suggestions[activeSuggestion];
             setQuery(selected.properties.name);
             setCoord(selected.geometry.coordinates);
+            console.log(
+              "вызов функции onClickSearchButt",
+              selected.geometry.coordinates,
+              selected.properties.name
+            );
+
             onClickSearchButt(
               selected.geometry.coordinates,
               selected.properties.name
@@ -100,7 +110,7 @@ export default function Search({ getForecast, getCity }) {
     const value = e.target.value;
     setHasError(false);
     setQuery(value);
-    setCheck_input(0);
+    // setCheck_input(0);
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       handleChange(value);
@@ -135,7 +145,10 @@ export default function Search({ getForecast, getCity }) {
         }
         if (data.length > 0) {
           setSuggestions(data || []);
-          console.log(data[0].properties.name);
+          console.log("первая посказка:", data[0].properties.name);
+          setFirstSugg(data[0].properties.name);
+        } else {
+          setSuggestions([]);
         }
       } catch (err) {
         console.error("Ошибка при выполнии запроса подсказок:", err);
@@ -145,38 +158,14 @@ export default function Search({ getForecast, getCity }) {
       setSuggestions([]);
     }
   };
-  async function requestWeatherForCoord(coordinates) {
-    try {
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?lat=${coordinates[1]}&lon=${coordinates[0]}&appid=89e57a1856bf2c6e661180d8eee2fe8e&units=metric&lang=ru`
-      );
-      if (!response.ok) return null;
-      return await response.json();
-    } catch (err) {
-      console.error(err);
-      return null;
-    }
-  }
-  async function searchCoordinatesForCity(city) {
-    try {
-      const response = await fetch(
-        `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=89e57a1856bf2c6e661180d8eee2fe8e`
-      );
-      if (!response.ok) return null;
-      return await response.json();
-    } catch (err) {
-      console.error(err);
-      return null;
-    }
-  }
 
   async function onClickSearchButt(coordinates, city) {
     setErrorName("");
     setHasError(false);
     setSuggestions([]);
 
-    console.log("check_input: ", check_input);
-    console.log("coond: ", coordinates);
+    // console.log("check_input: ", check_input);
+    console.log("coord: ", coordinates);
 
     if (coordinates.length == 2) {
       try {
@@ -200,26 +189,35 @@ export default function Search({ getForecast, getCity }) {
         const data = await searchCoordinatesForCity(city);
         if (!data || data.length === 0) {
           setHasError(true);
-          setErrorName("Город не найден");
+          setErrorName(
+            "Город не найден, попробуйте воспрользоваться подсказками"
+          );
           return;
         }
 
         if (data.length > 0) {
+          const responseCityOfRequest = await cityOfRequest(city);
+
+          if (!responseCityOfRequest) {
+            setErrorName("ошибка при запросе города");
+            setHasError(true);
+            return;
+          }
+
+          const cityOfRequestJson = await responseCityOfRequest.json();
+          getCity(cityOfRequestJson[0].name);
+
           const latLon = [data[0].lon, data[0].lat];
-
           console.log("coord: ", latLon);
-
           const weatherData = await requestWeatherForCoord(latLon);
-
           setResponseWeather(weatherData);
           getForecast(weatherData);
-          getCity(city);
           setCoord([]);
           console.log("responseWeather: ", weatherData);
         } else {
           console.log("координаты не найдены");
           setErrorName(
-            "Город не найден, попробуйте воспользоваться подсказками"
+            "Не удалось найти город, попробуйте воспользоваться подсказками"
           );
           setHasError(true);
           setSuggestions([]);
