@@ -29,6 +29,7 @@ export default function Search({ getForecast, getCity }) {
   //сделать красивее подсказки
   //продолжить строка 209. доделать отправку города и во втором случае. проверить работу
   //навигация по подсказкам, и выполнение поиска при нажатии enter
+  //переключение подсказок стерлочками
   useEffect(() => {
     function suggNavigation(event) {
       switch (event.key) {
@@ -174,6 +175,7 @@ export default function Search({ getForecast, getCity }) {
 
         setResponseWeather(data);
         getForecast(data);
+
         getCity(city);
         setCoord([]);
 
