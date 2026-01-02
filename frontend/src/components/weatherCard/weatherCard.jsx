@@ -3,7 +3,7 @@ import WeatherIcon from "./weatherIcon";
 import { useState } from "react";
 
 export default function WeatherCard({
-  data,
+  date,
   index,
   city,
   code,
@@ -13,7 +13,7 @@ export default function WeatherCard({
   wind,
   humidity,
 }) {
-  const dataTime = data.slice(5, 16);
+  const dataTime = date.slice(5, 16);
   const dataTimeFormatted = `${dataTime[3]}${dataTime[4]}-${dataTime[0]}${
     dataTime[1]
   } ${dataTime.slice(-5)}`;
@@ -60,7 +60,7 @@ export default function WeatherCard({
     <>
       {dataTime.slice(-5, -3) == "00" || index === 0 ? (
         <h2 className={classes.headerOfDay}>
-          {whichDayOfWeek(data.slice(0, 10))}
+          {whichDayOfWeek(date.slice(0, 10))}
         </h2>
       ) : null}
       <section className={`${classes.card} ${classes[timeOfDay]}`}>
@@ -70,7 +70,16 @@ export default function WeatherCard({
         </div>
         <div className={classes.infoOfCard}>
           <div className={classes.blockWeather}>
-            <WeatherIcon className={classes.icon} code={code} />
+            <WeatherIcon
+              className={classes.icon}
+              code={code}
+              isDay={
+                parseInt(date.slice(-5, -3), 10) >= 6 &&
+                parseInt(date.slice(-5, -3), 10) < 21
+                  ? 1
+                  : 0
+              }
+            />
             {descriptionToUpp}
           </div>
           <div className={classes.temp}>{`${temperature}°`}</div>

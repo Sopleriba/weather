@@ -12,16 +12,20 @@ export default function SuggestionsList({
   activeLi,
   onSelectSuggestion,
 }) {
-  if (!suggestions || suggestions.length === 0) return null;
+  const filteredSuggestions = suggestions.filter(
+    (city) => city.properties.city
+  );
+
+  if (!filteredSuggestions || filteredSuggestions.length === 0) return null;
 
   return (
     <ul
       className={`${classes.ulSearch} ${classes.suggestions} ${
-        suggestions.length > 0 ? classes.visible : ""
+        filteredSuggestions.length > 0 ? classes.visible : ""
       }`}
       ref={ref}
     >
-      {suggestions.map((city, index) => (
+      {filteredSuggestions.map((city, index) => (
         <li
           className={`${classes.search_li} ${
             activeLi === index ? classes.active : ""
@@ -30,12 +34,12 @@ export default function SuggestionsList({
           onClick={() => {
             setActiveSuggestion(null);
             () => onSelectSuggestion(city);
-            setQuery(city.properties.name);
+            setQuery(city.properties.city);
             setSuggestions([]);
             setCoord(city.geometry.coordinates);
           }}
         >
-          {city.properties.name}, {city.properties.country}
+          {city.properties.city}, {city.properties.country}
         </li>
       ))}
     </ul>

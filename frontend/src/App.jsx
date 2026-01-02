@@ -10,9 +10,13 @@ function App() {
   const [city, setCity] = useState();
 
   function getForecast(data) {
+    console.log("getForecast вызвалась", data);
+
     setForecastData(data);
   }
-  function getCity1(city) {
+  function getCity(city) {
+    console.log("getCity вызвалась", city);
+
     const City = city.charAt(0).toUpperCase() + city.slice(1);
     setCity(City);
   }
@@ -21,12 +25,11 @@ function App() {
     <>
       <div id="main_block">
         <h1 id="main_inscription">Weather</h1>
-        <Search getForecast={getForecast} getCity={getCity1} />
+        <Search getForecast={getForecast} getCity={getCity} />
         {forecastData ? (
           <Forecast forecastData={forecastData} cityData={city} />
         ) : null}
       </div>
-
     </>
   );
 }

@@ -6,7 +6,6 @@ import SuggestionsList from "../suggestions/suggestionsList.jsx";
 import Input from "../input/input.jsx";
 import requestWeatherForCoord from "../../api/requestWeatherForCoord.jsx";
 import searchCoordinatesForCity from "../../api/searchCoordinatesForCity.jsx";
-import cityOfRequest from "../../api/cityOfRequest.jsx";
 
 export default function Search({ getForecast, getCity }) {
   const [query, setQuery] = useState("");
@@ -23,35 +22,34 @@ export default function Search({ getForecast, getCity }) {
   const refSuggList = useRef(null);
   const timer = useRef();
 
-  //проблема 1: нужно отменять первый запрос если уже начал выполнятся второй, либо поменять как-то апи, тк долгие запросы
-  //проблема 2: че-то странное происходит если по разному делать запрос, типо через энтер, мышкой, таб и тд
+  //проблема 1: нужно поменять апи, тк долгие запросы
   //дописать погоду в карточках
   //сделать красивее подсказки
-  //продолжить строка 209. доделать отправку города и во втором случае. проверить работу
-  //навигация по подсказкам, и выполнение поиска при нажатии enter
-  //переключение подсказок стерлочками
+  //сделать фильтр подсказок, поменять апи погоды, data[0].geometry is undefined при вводе горпода вручную
+  //сделать загрузку визуально, и оповещать пользователя что нет ответа
+  //доделать иконки и запрос погоды
   useEffect(() => {
     function suggNavigation(event) {
       switch (event.key) {
         case "Enter":
           event.preventDefault();
-          if (activeSuggestion === null && query.length >= 2) {
+          if (activeSuggestion === null && query.length >= 3) {
             console.log("вызов функции onClickSearchButt", coord, query);
 
             onClickSearchButt(coord, query);
           } else if (activeSuggestion !== null && suggestions.length > 0) {
             const selected = suggestions[activeSuggestion];
-            setQuery(selected.properties.name);
+            setQuery(selected.properties.city);
             setCoord(selected.geometry.coordinates);
             console.log(
               "вызов функции onClickSearchButt",
               selected.geometry.coordinates,
-              selected.properties.name
+              selected.properties.city
             );
 
             onClickSearchButt(
               selected.geometry.coordinates,
-              selected.properties.name
+              selected.properties.city
             );
           }
           break;
@@ -120,22 +118,29 @@ export default function Search({ getForecast, getCity }) {
 
   const handleChange = async (value) => {
     // const input = document.querySelector(`.${classes.input}`);
-
-    if (value.length > 1) {
+    //1fb2727bbe5541fd88190ad54394b76e
+    //
+    if (value.length > 2) {
       try {
+        // const response = await fetch(
+        //   `https://photon.komoot.io/api/?q=${encodeURIComponent(
+        //     value
+        //   )}&lang=default&limit=10&osm_tag=place:city`
+        // );
         const response = await fetch(
-          `https://photon.komoot.io/api/?q=${encodeURIComponent(
+          `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
             value
-          )}&lang=default&limit=10&osm_tag=place:city`
+          )}&type=city&limit=10&lang=ru&apiKey=1fb2727bbe5541fd88190ad54394b76e`
         );
 
-        const response_json = await response.json();
+        const responseCoordinates = await response.json();
 
         const data = [];
         const check = new Set();
 
-        for (const feature of response_json.features) {
-          const city = feature.properties.name;
+        for (const feature of responseCoordinates.features) {
+          const city = feature.properties.city;
+
           const country = feature.properties.country;
           const key = `${city}-${country}`;
 
@@ -145,9 +150,12 @@ export default function Search({ getForecast, getCity }) {
           }
         }
         if (data.length > 0) {
-          setSuggestions(data || []);
-          console.log("первая посказка:", data[0].properties.name);
-          setFirstSugg(data[0].properties.name);
+          console.log("data: ", data);
+
+          setSuggestions(data);
+
+          console.log("первая посказка:", data[0].properties.city);
+          setFirstSugg(data[0].properties.city);
         } else {
           setSuggestions([]);
         }
@@ -172,14 +180,24 @@ export default function Search({ getForecast, getCity }) {
       try {
         console.log("запрос погоды");
         const data = await requestWeatherForCoord(coordinates);
+        if (data) {
+          // const filteredWeather = data.map(() => {
 
-        setResponseWeather(data);
-        getForecast(data);
+          // })
 
-        getCity(city);
-        setCoord([]);
+          setResponseWeather(data);
+          getForecast(data);
 
-        console.log("responseWeather: ", data);
+          getCity(city);
+          setCoord([]);
+
+          console.log("responseWeather: ", data);
+        } else {
+          console.error("ошибка запроса погоды");
+          setErrorName("Не удалось найти погоду в этом городе");
+          setHasError(true);
+          return null;
+        }
       } catch (err) {
         console.error("ошибка запроса погоды: ", err);
         setHasError(true);
@@ -189,6 +207,8 @@ export default function Search({ getForecast, getCity }) {
     } else if (coordinates.length != 2) {
       try {
         const data = await searchCoordinatesForCity(city);
+        console.log("data: ", data);
+
         if (!data || data.length === 0) {
           setHasError(true);
           setErrorName(
@@ -197,29 +217,41 @@ export default function Search({ getForecast, getCity }) {
           return;
         }
 
-        if (data.length > 0) {
-          const responseCityOfRequest = await cityOfRequest(city);
+        if (data) {
+          // const responseCityOfRequest = await cityOfRequest(city);
 
-          if (!responseCityOfRequest) {
-            setErrorName("ошибка при запросе города");
-            setHasError(true);
-            return;
-          }
+          // if (!responseCityOfRequest) {
+          //   setErrorName("ошибка при запросе города");
+          //   setHasError(true);
+          //   return;
+          // }
+          // console.log("123", responseCityOfRequest[0].local_names.ru);
 
-          const cityOfRequestJson = await responseCityOfRequest.json();
-          getCity(cityOfRequestJson[0].name);
+          getCity(data[0].name);
 
-          const latLon = [data[0].lon, data[0].lat];
-          console.log("coord: ", latLon);
-          const weatherData = await requestWeatherForCoord(latLon);
-          setResponseWeather(weatherData);
-          getForecast(weatherData);
-          setCoord([]);
+          console.log("координаты ", data);
+          console.log("координаты lon ", data[0].lon);
+
+          const lonLat = [data[0].lon, data[0].lat]; //первое lon, второе lat
+          console.log("coord: ", lonLat);
+          const weatherData = await requestWeatherForCoord(lonLat);
           console.log("responseWeather: ", weatherData);
+
+          if (weatherData) {
+            console.log("погода получена");
+
+            // setResponseWeather(weatherData);
+            getForecast(weatherData);
+            setCoord([]);
+          } else {
+            setErrorName("Не удалось найти погоду в этом городе");
+            setHasError(true);
+            return null;
+          }
         } else {
           console.log("координаты не найдены");
           setErrorName(
-            "Не удалось найти город, попробуйте воспользоваться подсказками"
+            `Не удалось найти город, возможно вы имели ввиду ${firstSugg}`
           );
           setHasError(true);
           setSuggestions([]);
@@ -227,7 +259,7 @@ export default function Search({ getForecast, getCity }) {
       } catch (err) {
         console.error("ошибка поиска города: ", err);
         setErrorName(
-          "Не удалось найти город, попробуйте воспользоваться подсказками"
+          `Не удалось найти город, возможно вы имели ввиду ${firstSugg}`
         );
         setHasError(true);
       }
@@ -245,7 +277,14 @@ export default function Search({ getForecast, getCity }) {
         ></Input>
         <Button
           value="Найти"
-          onClick={() => onClickSearchButt(coord, query)}
+          onClick={() => {
+            onClickSearchButt(coord, query),
+              console.log(
+                "вызов onclicksearchbutton coord: query: ",
+                coord,
+                query
+              );
+          }}
         ></Button>
       </div>
       {hasError ? <p className={classes.errorMessage}>{errorName}</p> : null}

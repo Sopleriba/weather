@@ -5,13 +5,13 @@
 }
 #main_block {
   width: 100%;
-  padding-top: 10rem;
+  padding-top: 5rem;
 }
 
 #main_inscription {
   margin: auto;
   width: fit-content;
-  font-size: 10.5rem;
+  font-size: 8rem;
   margin-bottom: 1rem;
   font-weight: 700;
 }
