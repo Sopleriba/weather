@@ -12,6 +12,10 @@ import {
   WiSnowflakeCold,
   WiFog,
   WiSnowWind,
+  WiNightAltPartlyCloudy,
+  WiSprinkle,
+  WiSleet,
+  WiStormShowers,
 } from "react-icons/wi";
 
 export default function weatherIcon({ code, isDay = 1, size = 100 }) {
