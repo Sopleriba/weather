@@ -25,19 +25,21 @@
   text-align: center;
   align-items: center;
   width: 22%;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 400;
+  padding-top: 1rem;
 }
 .icon {
   width: 100px;
 }
 .temp {
+  padding-top: 0.5rem;
   font-size: 5rem;
   display: flex;
 }
 .detalesWeather {
-  font-size: 1.6rem;
-  padding-top: 0.5rem;
+  font-size: 1.4rem;
+  padding-top: 1.3rem;
 }
 .morning {
 }

@@ -22,12 +22,9 @@ export default function Search({ getForecast, getCity }) {
   const refSuggList = useRef(null);
   const timer = useRef();
 
-  //проблема 1: нужно поменять апи, тк долгие запросы
   //дописать погоду в карточках
   //сделать красивее подсказки
-  //сделать фильтр подсказок, поменять апи погоды, data[0].geometry is undefined при вводе горпода вручную
   //сделать загрузку визуально, и оповещать пользователя что нет ответа
-  //доделать иконки и запрос погоды
   useEffect(() => {
     function suggNavigation(event) {
       switch (event.key) {

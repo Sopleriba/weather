@@ -22,9 +22,33 @@ export default function WeatherCard({
   const temperature = temp.toFixed(0);
   const descriptionToUpp =
     description.charAt(0).toUpperCase() + description.slice(1);
-  const timeOfDay = WhatTimeOfDay(dataTime);
+  const timeOfDay = whatTimeOfDay(dataTime);
+  function getWIndDirection(wind) {
+    wind = ((wind % 360) + 360) % 360;
 
-  function WhatTimeOfDay(dataTime) {
+    switch (true) {
+      case wind >= 337.5 || wind < 22.5:
+        return "В →";
+      case wind >= 22.5 && wind < 67.5:
+        return "СВ ↗";
+      case wind >= 67.5 && wind < 112.5:
+        return "С ↑";
+      case wind >= 112.5 && wind < 157.5:
+        return "СЗ ↖";
+      case wind >= 157.5 && wind < 202.5:
+        return "З ←";
+      case wind >= 202.5 && wind < 247.5:
+        return "ЮЗ ↙";
+      case wind >= 247.5 && wind < 292.5:
+        return "Ю ↓";
+      case wind >= 292.5 && wind < 337.5:
+        return "ЮВ ↘";
+      default:
+        return "?";
+    }
+  }
+
+  function whatTimeOfDay(dataTime) {
     switch (dataTime.slice(-5, -3)) {
       case "00":
       case "03":
@@ -86,10 +110,11 @@ export default function WeatherCard({
           <div className={classes.detalesWeather}>
             <p className={classes.feelsLike}>
               Ощущается как:{" "}
-              <span style={{ marginLeft: "5px" }}>{feelsLike}</span>
+              <span style={{ marginLeft: "5px" }}>{feelsLike}°</span>
             </p>
-            <p></p>
-            <p></p>
+            <p>Скорость ветра: {wind[0].toFixed(0)}км/ч</p>
+            <p>Направление: {getWIndDirection(wind[1])}</p>
+            <p style={{ marginBottom: "0" }}>Влажность: {humidity}%</p>
           </div>
         </div>
       </section>

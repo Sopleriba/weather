@@ -18,7 +18,7 @@ export default function Forecast({ forecastData, cityData }) {
     for (let i = 0; i < countCards; i++) {
       cards.push(
         createCardObj(
-          i, //isdex
+          i, //index
           forecastData.hourly.time[i], //date
           forecastData.hourly.weather_code[i], //coed
 
