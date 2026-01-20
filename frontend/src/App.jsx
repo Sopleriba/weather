@@ -1,8 +1,6 @@
 import { useState } from "react";
 import "./App.css";
 import Search from "./components/search/search.jsx";
-import WeatherIcon from "./components/weatherCard/weatherIcon.jsx";
-import WeatherCard from "./components/weatherCard/weatherCard.jsx";
 import Forecast from "./components/forecast/forecast.jsx";
 
 function App() {

@@ -14,15 +14,16 @@ export default function WeatherCard({
   humidity,
 }) {
   const dataTime = date.slice(5, 16);
-  const dataTimeFormatted = `${dataTime[3]}${dataTime[4]}-${dataTime[0]}${
-    dataTime[1]
-  } ${dataTime.slice(-5)}`;
+  const dataTimeFormatted = `${dataTime[3]}${dataTime[4]} ${getMonth(
+    dataTime
+  )} ${dataTime.slice(-5)}`;
 
   const feelsLike = feels.toFixed(0);
   const temperature = temp.toFixed(0);
+
   const descriptionToUpp =
     description.charAt(0).toUpperCase() + description.slice(1);
-  const timeOfDay = whatTimeOfDay(dataTime);
+  const timeOfDay = getTimeOfDay(dataTime);
   function getWIndDirection(wind) {
     wind = ((wind % 360) + 360) % 360;
 
@@ -48,7 +49,7 @@ export default function WeatherCard({
     }
   }
 
-  function whatTimeOfDay(dataTime) {
+  function getTimeOfDay(dataTime) {
     switch (dataTime.slice(-5, -3)) {
       case "00":
       case "03":
@@ -66,8 +67,8 @@ export default function WeatherCard({
         return "day";
     }
   }
-  function whichDayOfWeek(day) {
-    const date = new Date(day); // формат 2025-11-19
+  function getDayOfWeek(day) {
+    const date = new Date(day);
     const weekdays = [
       "Воскресенье",
       "Понедельник",
@@ -77,14 +78,32 @@ export default function WeatherCard({
       "Пятница",
       "Суббота",
     ];
+
     return weekdays[date.getDay()];
+  }
+  function getMonth(date) {
+    const months = [
+      "Января",
+      "Февраля",
+      "Марта",
+      "Апреля",
+      "Мая",
+      "Июня",
+      "Июля",
+      "Августа",
+      "Сентября",
+      "Октября",
+      "Ноября",
+      "Декабря",
+    ];
+    return months[date.slice(0, 1)];
   }
 
   return (
     <>
       {dataTime.slice(-5, -3) == "00" || index === 0 ? (
         <h2 className={classes.headerOfDay}>
-          {whichDayOfWeek(date.slice(0, 10))}
+          {getDayOfWeek(date.slice(0, 10))}
         </h2>
       ) : null}
       <section className={`${classes.card} ${classes[timeOfDay]}`}>
@@ -106,11 +125,15 @@ export default function WeatherCard({
             />
             {descriptionToUpp}
           </div>
-          <div className={classes.temp}>{`${temperature}°`}</div>
+          <div className={classes.temp}>{`${
+            temperature === "-0" ? "0" : temperature
+          }°`}</div>
           <div className={classes.detalesWeather}>
             <p className={classes.feelsLike}>
               Ощущается как:{" "}
-              <span style={{ marginLeft: "5px" }}>{feelsLike}°</span>
+              <span style={{ marginLeft: "5px" }}>
+                {feelsLike === "-0" ? "0" : feelsLike}°
+              </span>
             </p>
             <p>Скорость ветра: {wind[0].toFixed(0)}км/ч</p>
             <p>Направление: {getWIndDirection(wind[1])}</p>

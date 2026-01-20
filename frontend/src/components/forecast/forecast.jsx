@@ -7,15 +7,11 @@ export default function Forecast({ forecastData, cityData }) {
   const [infoForCards, setInfoForCards] = useState([]);
   const [countCards, setCountCards] = useState(24);
 
-  useEffect(() => {
-    if (forecastData) {
-      console.log("132123");
-      console.log(forecastData.hourly.time[1]);
+  const date = new Date();
 
-      // setInfoForCards(forecastData.hourly.time.slice(0, 24));
-    }
+  useEffect(() => {
     const cards = [];
-    for (let i = 0; i < countCards; i++) {
+    for (let i = date.getHours(); i < countCards; i++) {
       cards.push(
         createCardObj(
           i, //index
@@ -38,8 +34,8 @@ export default function Forecast({ forecastData, cityData }) {
             forecastData.hourly.wind_speed_10m[i],
             forecastData.hourly.wind_direction_10m[i],
           ],
-          forecastData.hourly.relative_humidity_2m[i] //humidity
-        )
+          forecastData.hourly.relative_humidity_2m[i], //humidity
+        ),
       );
     }
     setInfoForCards(cards);
@@ -53,7 +49,7 @@ export default function Forecast({ forecastData, cityData }) {
     temp,
     feels,
     wind,
-    humidity
+    humidity,
   ) {
     return {
       index: index,
@@ -147,8 +143,7 @@ export default function Forecast({ forecastData, cityData }) {
     console.log("прогноз не получен", forecastData);
     return null;
   }
-  //температура, ощущается, description,
-  // time, city, code, description
+
   return (
     <>
       <TabsSection onSelectButton={onSelectButton} />
